@@ -1,6 +1,10 @@
 """LangGraph workflow skeleton."""
 
-from multi_agent_research_lab.core.errors import StudentTodoError
+from multi_agent_research_lab.agents.analyst import AnalystAgent
+from multi_agent_research_lab.agents.researcher import ResearcherAgent
+from multi_agent_research_lab.agents.supervisor import SupervisorAgent
+from multi_agent_research_lab.agents.writer import WriterAgent
+from multi_agent_research_lab.core.config import get_settings
 from multi_agent_research_lab.core.state import ResearchState
 
 
@@ -17,7 +21,11 @@ class MultiAgentWorkflow:
         Suggested nodes: supervisor, researcher, analyst, writer, optional critic.
         """
 
-        raise StudentTodoError("TODO(student): implement MultiAgentWorkflow.build")
+        return {
+            "researcher": ResearcherAgent(),
+            "analyst": AnalystAgent(),
+            "writer": WriterAgent(),
+        }
 
     def run(self, state: ResearchState) -> ResearchState:
         """Execute the graph and return final state.
@@ -25,4 +33,14 @@ class MultiAgentWorkflow:
         TODO(student): Compile graph, invoke it, and convert result back to ResearchState.
         """
 
-        raise StudentTodoError("TODO(student): implement MultiAgentWorkflow.run")
+        agents = self.build()
+        max_iterations = get_settings().max_iterations
+        while state.iteration < max_iterations:
+            SupervisorAgent().run(state)
+            route = state.route_history[-1]
+            if route == "done":
+                break
+            agents[route].run(state)
+        if not state.final_answer and state.iteration >= max_iterations:
+            state.errors.append("max_iterations reached")
+        return state

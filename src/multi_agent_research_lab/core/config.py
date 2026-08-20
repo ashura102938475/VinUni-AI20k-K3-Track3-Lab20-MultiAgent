@@ -19,6 +19,11 @@ class Settings(BaseSettings):
 
     openai_api_key: str | None = Field(default=None, validation_alias="OPENAI_API_KEY")
     openai_model: str = Field(default="gpt-4o-mini", validation_alias="OPENAI_MODEL")
+    openai_base_url: str | None = Field(default=None, validation_alias="OPENAI_BASE_URL")
+    llm_temperature: float = Field(default=1.0, validation_alias="LLM_TEMPERATURE")
+    llm_top_p: float = Field(default=0.95, validation_alias="LLM_TOP_P")
+    llm_max_tokens: int = Field(default=16384, validation_alias="LLM_MAX_TOKENS")
+    reasoning_budget: int = Field(default=16384, validation_alias="REASONING_BUDGET")
 
     langsmith_api_key: str | None = Field(default=None, validation_alias="LANGSMITH_API_KEY")
     langsmith_project: str = Field(

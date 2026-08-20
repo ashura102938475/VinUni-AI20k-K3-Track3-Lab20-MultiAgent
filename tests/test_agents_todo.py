@@ -5,15 +5,23 @@ SupervisorAgent, test này SẼ FAIL - đó là điều bình thường. Hãy x�
 bằng unit test thật cho routing policy của bạn.
 """
 
-import pytest
-
 from multi_agent_research_lab.agents import SupervisorAgent
-from multi_agent_research_lab.core.errors import StudentTodoError
-from multi_agent_research_lab.core.schemas import ResearchQuery
+from multi_agent_research_lab.core.schemas import ResearchQuery, SourceDocument
 from multi_agent_research_lab.core.state import ResearchState
 
 
-def test_supervisor_is_student_todo() -> None:
+def test_supervisor_routes_missing_sources_to_researcher() -> None:
     state = ResearchState(request=ResearchQuery(query="Explain multi-agent systems"))
-    with pytest.raises(StudentTodoError):
-        SupervisorAgent().run(state)
+    SupervisorAgent().run(state)
+    assert state.route_history == ["researcher"]
+
+
+def test_supervisor_routes_complete_state_to_done() -> None:
+    state = ResearchState(
+        request=ResearchQuery(query="Explain multi-agent systems"),
+        sources=[SourceDocument(title="source", snippet="evidence")],
+        research_notes="notes",
+        analysis_notes="analysis",
+    )
+    SupervisorAgent().run(state)
+    assert state.route_history == ["writer"]
