@@ -22,20 +22,22 @@ def trace_span(name: str, attributes: dict[str, Any] | None = None) -> Iterator[
     started = perf_counter()
     span: dict[str, Any] = {"name": name, "attributes": attributes or {}, "duration_seconds": None}
     observation = None
+    observation_context = None
     settings = get_settings()
     if settings.langfuse_public_key and settings.langfuse_secret_key:
         try:
             from langfuse import get_client
 
-            observation = get_client().start_as_current_observation(
+            observation_context = get_client().start_as_current_observation(
                 as_type="span", name=name, metadata=attributes or {}
             )
+            observation = observation_context.__enter__()
         except ImportError:
             span["langfuse"] = "install langfuse to enable remote tracing"
     try:
         yield span
     finally:
         span["duration_seconds"] = perf_counter() - started
-        if observation is not None:
+        if observation is not None and observation_context is not None:
             observation.update(metadata={"duration_seconds": span["duration_seconds"]})
-            observation.end()
+            observation_context.__exit__(None, None, None)

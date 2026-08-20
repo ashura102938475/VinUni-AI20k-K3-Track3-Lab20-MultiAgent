@@ -11,8 +11,14 @@ Start the local UI/API:
 docker compose -f docker-compose.langfuse.yml up -d
 ```
 
-Open `http://localhost:3001`, create a project, and copy its public/secret
-keys into `.env`:
+Open `http://localhost:3001` and sign in with the preconfigured local account:
+
+```text
+Email: admin@research-lab.local
+Password: LocalLabAdmin-2026-change-me
+```
+
+The project credentials are already configured in `.env`:
 
 ```env
 LANGFUSE_PUBLIC_KEY=pk-lf-...
