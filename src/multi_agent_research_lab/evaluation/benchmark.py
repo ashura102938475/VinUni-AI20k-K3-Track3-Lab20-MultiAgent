@@ -28,6 +28,7 @@ def run_benchmark(
     )
     metrics = BenchmarkMetrics(
         run_name=run_name, latency_seconds=latency,
+        estimated_cost_usd=state.estimated_cost_usd,
         quality_score=8.0 if state.final_answer else 0.0,
         citation_coverage=citations / len(state.sources) if state.sources else 0.0,
         failure_rate=1.0 if state.errors else 0.0,

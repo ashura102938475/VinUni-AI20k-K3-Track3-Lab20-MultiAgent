@@ -27,6 +27,8 @@ class SupervisorAgent(BaseAgent):
             route = "analyst"
         elif not state.final_answer:
             route = "writer"
+        elif not any(event["name"] == "critic" for event in state.trace):
+            route = "critic"
         else:
             route = "done"
         state.record_route(route)

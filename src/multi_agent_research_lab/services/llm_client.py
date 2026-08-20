@@ -50,8 +50,17 @@ class LLMClient:
             timeout=settings.timeout_seconds,
         )
         usage = response.usage
+        input_tokens = usage.prompt_tokens if usage else None
+        output_tokens = usage.completion_tokens if usage else None
+        cost = None
+        if input_tokens is not None and output_tokens is not None:
+            cost = (
+                input_tokens * settings.input_cost_per_million
+                + output_tokens * settings.output_cost_per_million
+            ) / 1_000_000
         return LLMResponse(
             content=response.choices[0].message.content or "",
-            input_tokens=usage.prompt_tokens if usage else None,
-            output_tokens=usage.completion_tokens if usage else None,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            cost_usd=cost,
         )

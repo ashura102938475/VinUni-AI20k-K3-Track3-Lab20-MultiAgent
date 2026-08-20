@@ -1,11 +1,13 @@
 """LangGraph workflow skeleton."""
 
 from multi_agent_research_lab.agents.analyst import AnalystAgent
+from multi_agent_research_lab.agents.critic import CriticAgent
 from multi_agent_research_lab.agents.researcher import ResearcherAgent
 from multi_agent_research_lab.agents.supervisor import SupervisorAgent
 from multi_agent_research_lab.agents.writer import WriterAgent
 from multi_agent_research_lab.core.config import get_settings
 from multi_agent_research_lab.core.state import ResearchState
+from multi_agent_research_lab.observability.tracing import trace_span
 
 
 class MultiAgentWorkflow:
@@ -25,6 +27,7 @@ class MultiAgentWorkflow:
             "researcher": ResearcherAgent(),
             "analyst": AnalystAgent(),
             "writer": WriterAgent(),
+            "critic": CriticAgent(),
         }
 
     def run(self, state: ResearchState) -> ResearchState:
@@ -36,11 +39,13 @@ class MultiAgentWorkflow:
         agents = self.build()
         max_iterations = get_settings().max_iterations
         while state.iteration < max_iterations:
-            SupervisorAgent().run(state)
+            with trace_span("supervisor", {"iteration": state.iteration}):
+                SupervisorAgent().run(state)
             route = state.route_history[-1]
             if route == "done":
                 break
-            agents[route].run(state)
+            with trace_span(route, {"query": state.request.query}):
+                agents[route].run(state)
         if not state.final_answer and state.iteration >= max_iterations:
             state.errors.append("max_iterations reached")
         return state

@@ -52,6 +52,9 @@ def baseline(
         request.query,
     )
     state.final_answer = response.content
+    state.input_tokens = response.input_tokens or 0
+    state.output_tokens = response.output_tokens or 0
+    state.estimated_cost_usd = response.cost_usd or 0.0
     console.print(Panel.fit(state.final_answer, title="Single-Agent Baseline"))
 
 

@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     llm_top_p: float = Field(default=0.95, validation_alias="LLM_TOP_P")
     llm_max_tokens: int = Field(default=16384, validation_alias="LLM_MAX_TOKENS")
     reasoning_budget: int = Field(default=16384, validation_alias="REASONING_BUDGET")
+    input_cost_per_million: float = Field(default=0.0, validation_alias="INPUT_COST_PER_MILLION")
+    output_cost_per_million: float = Field(default=0.0, validation_alias="OUTPUT_COST_PER_MILLION")
 
     langsmith_api_key: str | None = Field(default=None, validation_alias="LANGSMITH_API_KEY")
     langsmith_project: str = Field(
